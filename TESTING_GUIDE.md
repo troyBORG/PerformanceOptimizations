@@ -87,8 +87,8 @@ The optimizations in this mod target **lock contention** and **multi-threaded pe
 
 1. **Enable metrics logging:**
    - Set `EnableMetrics: true` in config
-   - Set `ReportMetricsToConfig: true`
-   - Check `rml_config/PerformanceOptimizations.json` for metrics
+   - Set `ReportMetricsToCache: true`
+   - Check `[ResonitePath]/PerformanceOptimizationsCache.json` for metrics
 
 2. **Use FPS overlay:**
    - Enable FPS counter in Resonite settings

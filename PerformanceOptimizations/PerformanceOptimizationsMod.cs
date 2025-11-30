@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Collections.Concurrent;
 using System.Runtime.CompilerServices;
+using System.IO;
+using System.Text.Json;
 using SkyFrost.Base;
 
 namespace PerformanceOptimizations
@@ -60,17 +62,10 @@ namespace PerformanceOptimizations
             () => false);
 
         [AutoRegisterConfigKey]
-        private static readonly ModConfigurationKey<bool> ReportMetricsToConfig = new ModConfigurationKey<bool>(
-            "ReportMetricsToConfig",
-            "Report metrics data to config file (updates periodically)",
+        private static readonly ModConfigurationKey<bool> ReportMetricsToCache = new ModConfigurationKey<bool>(
+            "ReportMetricsToCache",
+            "Report metrics data to cache file (updates periodically)",
             () => false);
-
-        // Metrics data in config
-        [AutoRegisterConfigKey]
-        private static readonly ModConfigurationKey<Dictionary<string, long>> MetricsData = new ModConfigurationKey<Dictionary<string, long>>(
-            "MetricsData",
-            "Performance metrics data (updated when ReportMetricsToConfig is enabled)",
-            () => new Dictionary<string, long>());
 
         private static ModConfiguration? Config;
         private static Harmony? _harmony;
@@ -105,8 +100,8 @@ namespace PerformanceOptimizations
                 SetupMetrics();
             }
 
-            // Setup metrics reporting to config if enabled
-            if (Config.GetValue(ReportMetricsToConfig))
+            // Setup metrics reporting to cache file if enabled
+            if (Config.GetValue(ReportMetricsToCache))
             {
                 SetupMetricsReporting();
             }
@@ -176,20 +171,80 @@ namespace PerformanceOptimizations
 
         private void SetupMetricsReporting()
         {
-            // Update config with metrics every 30 seconds
-            // Config file location: Resonite/rml_config/PerformanceOptimizations.json
+            // Update cache file with metrics every 30 seconds
+            // Cache file location: [ResonitePath]/PerformanceOptimizationsCache.json
             _metricsUpdateTimer = new System.Threading.Timer(_ =>
             {
                 var metrics = PerformanceOptimizationsModHelper.GetMetrics();
-                if (metrics.Count > 0 && Config != null)
+                if (metrics.Count > 0)
                 {
-                    Config.Set(MetricsData, new Dictionary<string, long>(metrics));
-                    Config.Save();
+                    WriteMetricsToCache(metrics);
                 }
             }, null, TimeSpan.FromSeconds(30), TimeSpan.FromSeconds(30));
 
-            Msg("Metrics reporting to config enabled (updates every 30 seconds)");
-            Msg("Config file location: Resonite/rml_config/PerformanceOptimizations.json");
+            Msg("Metrics reporting to cache file enabled (updates every 30 seconds)");
+        }
+
+        private void WriteMetricsToCache(Dictionary<string, long> metrics)
+        {
+            try
+            {
+                // Get Resonite path from Engine
+                string? resonitePath = null;
+                if (Engine.Current != null)
+                {
+                    // Try to get the path from Engine's base directory
+                    var engineType = typeof(Engine);
+                    var baseDirectoryField = engineType.GetField("BaseDirectory", BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Public);
+                    if (baseDirectoryField != null)
+                    {
+                        resonitePath = baseDirectoryField.GetValue(null) as string;
+                    }
+                }
+
+                // Fallback: try AppDomain base directory (usually points to Resonite directory)
+                if (string.IsNullOrEmpty(resonitePath))
+                {
+                    var baseDir = AppDomain.CurrentDomain.BaseDirectory;
+                    if (!string.IsNullOrEmpty(baseDir) && File.Exists(Path.Combine(baseDir, "Resonite.exe")))
+                    {
+                        resonitePath = baseDir;
+                    }
+                    else
+                    {
+                        // Try to find Resonite directory by walking up from base directory
+                        var dir = new DirectoryInfo(baseDir);
+                        while (dir != null && !File.Exists(Path.Combine(dir.FullName, "Resonite.exe")))
+                        {
+                            dir = dir.Parent;
+                        }
+                        if (dir != null)
+                        {
+                            resonitePath = dir.FullName;
+                        }
+                    }
+                }
+
+                if (string.IsNullOrEmpty(resonitePath))
+                {
+                    Warn("Could not determine Resonite path for cache file");
+                    return;
+                }
+
+                string cacheFilePath = Path.Combine(resonitePath, "PerformanceOptimizationsCache.json");
+                
+                var options = new JsonSerializerOptions
+                {
+                    WriteIndented = true
+                };
+                
+                string json = JsonSerializer.Serialize(metrics, options);
+                File.WriteAllText(cacheFilePath, json);
+            }
+            catch (Exception ex)
+            {
+                Warn($"Failed to write metrics cache: {ex.Message}");
+            }
         }
 
         private void ValidatePatches()

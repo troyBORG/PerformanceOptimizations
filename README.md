@@ -139,8 +139,12 @@ Resonite/rml_config/PerformanceOptimizations.json
 - **EnableUpdateManager** (default: true) - Enable UpdateManager optimization
 - **EnableBatchQuery** (default: true) - Enable BatchQuery optimization
 - **EnableMetrics** (default: false) - Enable metrics logging
-- **ReportMetricsToConfig** (default: false) - Automatically update config with metrics data every 30 seconds
-- **MetricsData** - Dictionary containing collected performance metrics (auto-updated when ReportMetricsToConfig is enabled)
+- **ReportMetricsToCache** (default: false) - Automatically write metrics data to cache file every 30 seconds
+
+When `ReportMetricsToCache` is enabled, metrics are written to:
+```
+[ResonitePath]/PerformanceOptimizationsCache.json
+```
 
 You can edit the config file to toggle optimizations or enable metrics reporting. Changes take effect after restarting Resonite.
 
