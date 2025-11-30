@@ -17,7 +17,7 @@ namespace PerformanceOptimizations
     public class PerformanceOptimizationsMod : ResoniteMod
     {
         public override string Name => "PerformanceOptimizations";
-        public override string Author => "PerformanceOptimizations";
+        public override string Author => "troyBORG";
         public override string Version => "1.0.0";
         public override string Link => "https://github.com/troyBORG/PerformanceOptimizations";
 
