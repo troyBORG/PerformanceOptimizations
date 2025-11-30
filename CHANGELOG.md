@@ -2,7 +2,7 @@
 
 All notable changes to the PerformanceOptimizations mod will be documented in this file.
 
-## [1.0.0] - 2025-01-XX
+## [1.0.0] - 2025-11-29
 
 ### Added
 - **RecordCache Optimization**: Replaced `Dictionary<RecordId, TRecord>` with `ConcurrentDictionary` to eliminate lock contention
