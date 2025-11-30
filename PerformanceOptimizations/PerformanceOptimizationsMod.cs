@@ -19,7 +19,7 @@ namespace PerformanceOptimizations
         public override string Name => "PerformanceOptimizations";
         public override string Author => "PerformanceOptimizations";
         public override string Version => "1.0.0";
-        public override string Link => "https://github.com/PerformanceOptimizations/PerformanceOptimizations";
+        public override string Link => "https://github.com/troyBORG/PerformanceOptimizations";
 
         // Master toggle - enables/disables all optimizations at once
         [AutoRegisterConfigKey]
