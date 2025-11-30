@@ -185,67 +185,21 @@ namespace PerformanceOptimizations
             Msg("Metrics reporting to cache file enabled (updates every 30 seconds)");
         }
 
+        private static readonly string CacheFilePath = 
+            Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "PerformanceOptimizationsCache.json");
+
         private void WriteMetricsToCache(Dictionary<string, long> metrics)
         {
             try
             {
-                string? resonitePath = null;
-
-                // Method 1: Get path from mod DLL location (mods are in rml_mods subdirectory)
-                var modAssembly = System.Reflection.Assembly.GetExecutingAssembly();
-                if (modAssembly != null && !string.IsNullOrEmpty(modAssembly.Location))
-                {
-                    var modDir = Path.GetDirectoryName(modAssembly.Location);
-                    if (!string.IsNullOrEmpty(modDir))
-                    {
-                        // Mod DLL is in rml_mods, so go up one level to get Resonite root
-                        var parentDir = Directory.GetParent(modDir);
-                        if (parentDir != null && File.Exists(Path.Combine(parentDir.FullName, "Resonite.exe")))
-                        {
-                            resonitePath = parentDir.FullName;
-                        }
-                    }
-                }
-
-                // Method 2: Try AppDomain base directory (usually points to Resonite directory)
-                if (string.IsNullOrEmpty(resonitePath))
-                {
-                    var baseDir = AppDomain.CurrentDomain.BaseDirectory;
-                    if (!string.IsNullOrEmpty(baseDir) && File.Exists(Path.Combine(baseDir, "Resonite.exe")))
-                    {
-                        resonitePath = baseDir;
-                    }
-                    else
-                    {
-                        // Try to find Resonite directory by walking up from base directory
-                        var dir = new DirectoryInfo(baseDir);
-                        while (dir != null && !File.Exists(Path.Combine(dir.FullName, "Resonite.exe")))
-                        {
-                            dir = dir.Parent;
-                        }
-                        if (dir != null)
-                        {
-                            resonitePath = dir.FullName;
-                        }
-                    }
-                }
-
-                if (string.IsNullOrEmpty(resonitePath))
-                {
-                    Warn("Could not determine Resonite path for cache file");
-                    return;
-                }
-
-                string cacheFilePath = Path.Combine(resonitePath, "PerformanceOptimizationsCache.json");
-                
                 var options = new JsonSerializerOptions
                 {
                     WriteIndented = true
                 };
                 
                 string json = JsonSerializer.Serialize(metrics, options);
-                File.WriteAllText(cacheFilePath, json);
-                Msg($"Metrics cache written to: {cacheFilePath}");
+                File.WriteAllText(CacheFilePath, json);
+                Msg($"Metrics cache written to: {CacheFilePath}");
             }
             catch (Exception ex)
             {
