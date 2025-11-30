@@ -171,6 +171,21 @@ See [CHANGELOG.md](CHANGELOG.md) for detailed change history.
 
 This mod is production-ready and has been tested with the latest Resonite beta and RML.
 
+## Development
+
+This mod was developed using:
+- **[Cursor](https://cursor.sh/)** - AI-powered code editor for rapid development and optimization analysis
+- **[.NET GitHub Repository](https://github.com/dotnet/runtime)** - Reference implementation for thread-safe collections and performance patterns
+- **FrooxEngine Decompile** - Decompiled Resonite runtime code for identifying performance bottlenecks and understanding internal implementations
+
+The development process involved:
+1. **Performance Analysis**: Analyzing decompiled FrooxEngine and SkyFrost.Base code to identify lock contention hotspots
+2. **Pattern Recognition**: Studying .NET runtime source code to understand optimal thread-safe collection usage
+3. **Harmony Patching**: Using Cursor's AI assistance to craft non-invasive runtime patches
+4. **Iterative Testing**: Validating optimizations through runtime validation and metrics collection
+
+All optimizations were designed to be non-invasive and reversible, maintaining full compatibility with the base game while providing measurable performance improvements.
+
 ## License
 
 LGPL-3.0-or-later
