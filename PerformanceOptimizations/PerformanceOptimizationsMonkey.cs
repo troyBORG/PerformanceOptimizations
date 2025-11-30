@@ -30,10 +30,9 @@ namespace PerformanceOptimizations
         {
             try
             {
-                // Patch all Harmony patches in the assembly
-                // HarmonyPatchCategory attributes help organize patches
-                // Some warnings may appear but patches will still apply correctly
-                harmony.PatchAll(typeof(TMonkey).Assembly);
+                // Patch only the specific class, not the entire assembly
+                // This prevents conflicts when multiple patch classes exist in the same assembly
+                harmony.CreateClassProcessor(typeof(TMonkey)).Patch();
             }
             catch (Exception ex)
             {

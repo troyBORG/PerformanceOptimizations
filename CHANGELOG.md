@@ -2,6 +2,20 @@
 
 All notable changes to the PerformanceOptimizations mod will be documented in this file.
 
+## [1.0.1] - 2025-01-29
+
+### Fixed
+- Fixed Harmony patch conflicts by patching only specific classes instead of entire assembly
+- Eliminated warnings about "Patching exception in method BatchQuery.SendBatch"
+- Fixed metrics cache file writing to use correct path detection
+- Improved cache file path detection to match InventorySearch mod pattern
+- Fixed empty metrics cache file issue - now properly writes metrics data
+
+### Improved
+- Enhanced metrics reporting with better logging
+- Improved cache file path detection reliability
+- Better error handling for patch initialization
+
 ## [1.0.0] - 2025-11-29
 
 ### Added

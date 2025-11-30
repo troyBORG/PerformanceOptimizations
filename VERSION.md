@@ -1,13 +1,21 @@
 # Version Information
 
-## Current Version: 1.0.0
+## Current Version: 1.0.1
 
-**Release Date**: 2025-01-XX  
+**Release Date**: 2025-01-29  
 **Target Framework**: .NET 10.0  
 **Compatible RML Version**: Latest  
 **Compatible Resonite Version**: Latest Beta
 
 ## Version History
+
+### 1.0.1 (2025-01-29)
+- Fixed Harmony patch conflicts by patching only specific classes instead of entire assembly
+- Eliminated warnings about "Patching exception in method BatchQuery.SendBatch"
+- Fixed metrics cache file writing to use correct path detection
+- Improved cache file path detection to match InventorySearch mod pattern
+- Fixed empty metrics cache file issue - now properly writes metrics data
+- Enhanced metrics reporting with better logging
 
 ### 1.0.0 (Initial Release)
 - Initial release with 4 major optimizations
@@ -30,6 +38,7 @@ This project follows [Semantic Versioning](https://semver.org/):
 
 | Mod Version | Resonite Version | RML Version | .NET Version |
 |------------|------------------|-------------|--------------|
+| 1.0.1       | Latest Beta      | Latest      | 10.0         |
 | 1.0.0       | Latest Beta      | Latest      | 10.0         |
 
 ## Upgrade Notes

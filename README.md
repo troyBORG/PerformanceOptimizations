@@ -166,7 +166,7 @@ For a detailed analysis of all performance bottlenecks and optimization opportun
 
 ## Version
 
-Current version: **1.0.0**
+Current version: **1.0.1**
 
 See [VERSION.md](VERSION.md) for version history and compatibility information.  
 See [CHANGELOG.md](CHANGELOG.md) for detailed change history.
