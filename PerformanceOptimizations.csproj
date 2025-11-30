@@ -1,0 +1,69 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <AssemblyTitle>PerformanceOptimizations</AssemblyTitle>
+    <AssemblyFileName>$(AssemblyTitle).dll</AssemblyFileName>
+    <RootNamespace>PerformanceOptimizations</RootNamespace>
+    <Version>1.0.0</Version>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
+    <Description>High-performance optimizations for Resonite via Harmony patches. Reduces lock contention and improves multi-threaded performance.</Description>
+    <Authors>PerformanceOptimizations</Authors>
+    <Copyright>Copyright © 2025</Copyright>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
+  </PropertyGroup>
+  
+  <Target Name="CopyDll" AfterTargets="Build">
+    <MakeDir Condition="'$(CopyToLibraries)'=='true' AND '$(Configuration)'=='Release' AND !Exists('$(ResonitePath)\rml_mods')" 
+             Directories="$(ResonitePath)\rml_mods" />
+    <Copy Condition="'$(CopyToLibraries)'=='true' AND '$(Configuration)'=='Release' AND Exists('$(ResonitePath)')" 
+          SourceFiles="$(OutputPath)$(AssemblyFileName)" 
+          DestinationFiles="$(ResonitePath)\rml_mods\$(AssemblyFileName)" />
+    <Message Condition="'$(CopyToLibraries)'=='true' AND '$(Configuration)'=='Release' AND Exists('$(ResonitePath)')" 
+             Text="Copied '$(OutputPath)$(AssemblyFileName)' to '$(ResonitePath)\rml_mods\$(AssemblyFileName)'" 
+             Importance="high" />
+    <Warning Condition="'$(CopyToLibraries)'=='true' AND '$(Configuration)'=='Release' AND !Exists('$(ResonitePath)')" 
+             Text="Resonite path not found at '$(ResonitePath)'. DLL not copied. Please copy manually to your Resonite/rml_mods/ folder." />
+  </Target>
+
+  <ItemGroup>
+    <PackageReference Include="PolySharp" Version="1.15.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+  
+  <!-- Direct DLL references from Resonite installation -->
+  <ItemGroup>
+    <!-- ResoniteModLoader -->
+    <Reference Include="ResoniteModLoader">
+      <HintPath>$(ResonitePath)\Libraries\ResoniteModLoader.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    
+    <!-- Core Resonite DLLs -->
+    <Reference Include="FrooxEngine">
+      <HintPath>$(ResonitePath)\FrooxEngine.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="SkyFrost.Base">
+      <HintPath>$(ResonitePath)\SkyFrost.Base.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="SkyFrost.Base.Models">
+      <HintPath>$(ResonitePath)\SkyFrost.Base.Models.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    
+    <!-- Harmony from rml_libs -->
+    <Reference Include="0Harmony">
+      <HintPath>$(ResonitePath)\rml_libs\0Harmony.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+  </ItemGroup>
+  
+</Project>
+
