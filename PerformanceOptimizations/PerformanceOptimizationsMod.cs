@@ -189,20 +189,25 @@ namespace PerformanceOptimizations
         {
             try
             {
-                // Get Resonite path from Engine
                 string? resonitePath = null;
-                if (Engine.Current != null)
+
+                // Method 1: Get path from mod DLL location (mods are in rml_mods subdirectory)
+                var modAssembly = System.Reflection.Assembly.GetExecutingAssembly();
+                if (modAssembly != null && !string.IsNullOrEmpty(modAssembly.Location))
                 {
-                    // Try to get the path from Engine's base directory
-                    var engineType = typeof(Engine);
-                    var baseDirectoryField = engineType.GetField("BaseDirectory", BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Public);
-                    if (baseDirectoryField != null)
+                    var modDir = Path.GetDirectoryName(modAssembly.Location);
+                    if (!string.IsNullOrEmpty(modDir))
                     {
-                        resonitePath = baseDirectoryField.GetValue(null) as string;
+                        // Mod DLL is in rml_mods, so go up one level to get Resonite root
+                        var parentDir = Directory.GetParent(modDir);
+                        if (parentDir != null && File.Exists(Path.Combine(parentDir.FullName, "Resonite.exe")))
+                        {
+                            resonitePath = parentDir.FullName;
+                        }
                     }
                 }
 
-                // Fallback: try AppDomain base directory (usually points to Resonite directory)
+                // Method 2: Try AppDomain base directory (usually points to Resonite directory)
                 if (string.IsNullOrEmpty(resonitePath))
                 {
                     var baseDir = AppDomain.CurrentDomain.BaseDirectory;
@@ -240,6 +245,7 @@ namespace PerformanceOptimizations
                 
                 string json = JsonSerializer.Serialize(metrics, options);
                 File.WriteAllText(cacheFilePath, json);
+                Msg($"Metrics cache written to: {cacheFilePath}");
             }
             catch (Exception ex)
             {
