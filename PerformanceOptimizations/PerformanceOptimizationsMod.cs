@@ -75,6 +75,10 @@ namespace PerformanceOptimizations
         private static readonly Dictionary<string, long> _metrics = new Dictionary<string, long>();
         private static readonly object _metricsLock = new object();
         private static System.Threading.Timer? _metricsUpdateTimer;
+        
+        // Cache file path (same pattern as InventorySearch)
+        private static readonly string CacheFilePath = 
+            Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "PerformanceOptimizationsCache.json");
 
         public override void OnEngineInit()
         {
@@ -173,20 +177,15 @@ namespace PerformanceOptimizations
         {
             // Update cache file with metrics every 30 seconds
             // Cache file location: [ResonitePath]/PerformanceOptimizationsCache.json
+            Msg($"Cache file will be written to: {CacheFilePath}");
             _metricsUpdateTimer = new System.Threading.Timer(_ =>
             {
                 var metrics = PerformanceOptimizationsModHelper.GetMetrics();
-                if (metrics.Count > 0)
-                {
-                    WriteMetricsToCache(metrics);
-                }
+                WriteMetricsToCache(metrics);
             }, null, TimeSpan.FromSeconds(30), TimeSpan.FromSeconds(30));
 
             Msg("Metrics reporting to cache file enabled (updates every 30 seconds)");
         }
-
-        private static readonly string CacheFilePath = 
-            Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "PerformanceOptimizationsCache.json");
 
         private void WriteMetricsToCache(Dictionary<string, long> metrics)
         {
@@ -199,11 +198,18 @@ namespace PerformanceOptimizations
                 
                 string json = JsonSerializer.Serialize(metrics, options);
                 File.WriteAllText(CacheFilePath, json);
-                Msg($"Metrics cache written to: {CacheFilePath}");
+                if (metrics.Count > 0)
+                {
+                    Msg($"Metrics cache written to: {CacheFilePath} ({metrics.Count} metrics)");
+                }
+                else
+                {
+                    Msg($"Metrics cache written to: {CacheFilePath} (no metrics collected yet)");
+                }
             }
             catch (Exception ex)
             {
-                Warn($"Failed to write metrics cache: {ex.Message}");
+                Warn($"Failed to write metrics cache to {CacheFilePath}: {ex.Message}");
             }
         }
 
